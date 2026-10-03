@@ -1,0 +1,10 @@
+-- PostgreSQL production migration starting point.
+create extension if not exists pgcrypto;
+create table if not exists organizations(id uuid primary key default gen_random_uuid(),name text not null);
+create table if not exists users(id uuid primary key default gen_random_uuid(),organization_id uuid not null references organizations(id),email text unique not null,password_hash text not null,role text not null default 'owner',active boolean not null default true);
+create table if not exists locations(id uuid primary key default gen_random_uuid(),organization_id uuid not null references organizations(id),name text not null);
+create table if not exists customers(id uuid primary key default gen_random_uuid(),organization_id uuid not null references organizations(id),location_id uuid references locations(id),name text not null,email text,phone text,created_at timestamptz not null default now());
+create table if not exists revenue_opportunities(id uuid primary key default gen_random_uuid(),organization_id uuid not null references organizations(id),location_id uuid references locations(id),customer_id uuid references customers(id),lead_id uuid,type text not null,status text not null,reason text not null,severity text not null,estimated_value numeric(14,2) not null,probability numeric(6,5) not null,expected_value numeric(14,2) not null,confidence numeric(6,5) not null,detected_at timestamptz not null default now(),recommended_action text,attribution_status text not null default 'estimated',expires_at timestamptz,version integer not null default 1);
+create table if not exists opportunity_events(id uuid primary key default gen_random_uuid(),organization_id uuid not null references organizations(id),opportunity_id uuid not null references revenue_opportunities(id),event_type text not null,actor text not null,metadata jsonb not null default '{}',created_at timestamptz not null default now());
+create index if not exists revenue_opportunities_org_status_idx on revenue_opportunities(organization_id,status,expected_value desc);
+create index if not exists opportunity_events_opp_time_idx on opportunity_events(opportunity_id,created_at desc);
