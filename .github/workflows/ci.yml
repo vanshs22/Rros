@@ -1,0 +1,37 @@
+name: rros-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements-dev.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend build
+        run: npm ci --prefix frontend && npm run build --prefix frontend
+      - name: Frontend browser journey
+        run: npx --prefix frontend playwright install --with-deps chromium && npm run test:e2e --prefix frontend
+      - name: Compile
+        run: python -m compileall -q app tests
+      - name: Tests
+        run: python -m pytest -q
+      - name: Checklist readiness tests
+        run: python -m pytest -q tests/test_release_readiness.py
+      - name: AI evaluation regression suite
+        run: python scripts/ai_eval.py
+      - name: Machine-readable local release report
+        run: python scripts/release_report.py
+      - name: Local release gate
+        run: python scripts/release_gate.py --local

@@ -1,0 +1,16 @@
+export type Role = 'owner' | 'admin' | 'manager' | 'agent' | 'analyst' | 'member' | 'viewer' | string
+export type Me = { id: string; email: string; organization_id: string; organization_slug?: string | null; role: Role }
+export type Dashboard = Record<string, unknown> & { actual_recovered?: number; expected_value?: number; opportunity_count?: number; urgent?: number; leaks?: Record<string, number> }
+export type Opportunity = Record<string, unknown> & { id: string; reason?: string; type?: string; severity?: string; status?: string; expected_value?: number; estimated_value?: number; recovered_amount?: number; confidence?: number; priority_score?: number; customer_id?: string | null; assigned_user_id?: string | null }
+export type Customer = { id: string; name: string; email?: string | null; phone?: string | null; lifecycle_status?: string | null }
+export type Customer360 = { customer: Customer; lifetime_value?: number; health: { risk_score?: number; risk_level?: string; factors?: Array<{ factor?: string; impact?: number; detail?: string }> }; transactions: Array<Record<string, unknown>>; invoices: Array<Record<string, unknown>>; payments: Array<Record<string, unknown>>; reviews: Array<Record<string, unknown>>; messages: Array<Record<string, unknown>>; calls: Array<Record<string, unknown>>; consents: Array<Record<string, unknown>>; opportunities: Opportunity[] }
+export type Integration = { provider: string; name?: string; category?: string; auth?: string; status?: string; last_sync_at?: string | null; last_error?: string | null; health_checked_at?: string | null; capabilities?: string[]; implementation?: string }
+export type CatalogProvider = Integration & { key?: string; description?: string; scopes?: string[]; resources?: string[] }
+export type Agent = { id: string; key: string; name: string; description?: string; autonomy_mode?: string; version?: string; status?: string }
+export type AgentRun = { run: { id: string; opportunity_id?: string; status?: string; pipeline_version?: string; created_at?: string; completed_at?: string; output?: unknown }; agents?: Array<Record<string, unknown>>; handoffs?: Array<Record<string, unknown>>; memories?: Array<Record<string, unknown>> }
+export type Playbook = { id: string; name: string; description?: string; trigger_type?: string; conditions?: Record<string, unknown>; steps?: Array<Record<string, unknown>>; status?: string; version?: number; updated_at?: string }
+export type ApiKey = { id: string; name: string; key_prefix?: string; api_key?: string; active?: boolean; scopes?: string[]; created_at?: string; expires_at?: string | null; warning?: string }
+export type UserRecord = { id: string; email: string; role: string; active?: boolean }
+export type Onboarding = { score?: number; next?: string; ready_for_detection?: boolean; steps?: Array<{ key: string; title: string; complete: boolean }>; counts?: Record<string, number>; connected_integrations?: string[] }
+export type Usage = { plan?: string; subscription_status?: string; monthly_opportunity_limit?: number; month_to_date_opportunities?: number; remaining?: number; utilization?: number }
+export type SearchResult = { id?: string; type?: string; title?: string; name?: string; description?: string; [key: string]: unknown }

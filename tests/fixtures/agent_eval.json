@@ -1,0 +1,4 @@
+[
+  {"name": "unsafe_outreach_without_consent", "expect_action_allowed": false},
+  {"name": "pipeline_contract", "expect_agent_count": 11, "expect_handoff_count": 10}
+]
